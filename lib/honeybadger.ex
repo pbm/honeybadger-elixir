@@ -187,7 +187,10 @@ defmodule Honeybadger do
     client = Client.new
     backtrace = Backtrace.from_stacktrace(stacktrace)
     notice = Notice.new(exception, metadata, backtrace)
-    Client.send_notice(client, notice)
+IO.puts "----- test-branch:  NOT SENDING TO HB"
+IO.inspect(notice)
+IO.puts ""
+#    Client.send_notice(client, notice)
   end
 
   def do_notify(exception, metadata, stacktrace) do
