@@ -52,7 +52,9 @@ defmodule Honeybadger.Logger do
         |> get_in([:dictionary, :honeybadger_context])
         |> merge_metadata(get_in(message, [:dictionary, :logger_metadata]))
 
-      case message[:error_info] do
+      message[:error_info]
+      |> filter_error()
+      |> case do
         {_kind, {exception, stacktrace}, _stack} ->
           Honeybadger.notify(exception, context, stacktrace)
 
@@ -74,6 +76,10 @@ defmodule Honeybadger.Logger do
     :ok
   end
 
+  defp filter_error(error_info) do
+    IO.puts("--- #{__MODULE__}.filter_error(): #{inspect error_info}")
+    error_info
+  end
   defp merge_metadata(%{} = context, {_, metadata}) when is_list(metadata) do
     metadata
     |> Map.new()
