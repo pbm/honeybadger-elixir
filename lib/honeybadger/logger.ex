@@ -55,12 +55,13 @@ defmodule Honeybadger.Logger do
       message[:error_info]
       |> filter_error()
       |> case do
-        {_kind, {exception, stacktrace}, _stack} ->
-          Honeybadger.notify(exception, context, stacktrace)
+           {_kind, {exception, stacktrace}, _stack} ->
+               Honeybadger.notify(exception, context, stacktrace)
 
-        {_kind, exception, stacktrace} ->
-          Honeybadger.notify(exception, context, stacktrace)
-      end
+           {_kind, exception, stacktrace} ->
+               Honeybadger.notify(exception, context, stacktrace)
+         end
+
     rescue
       exception ->
         Logger.warn(fn ->
@@ -76,10 +77,15 @@ defmodule Honeybadger.Logger do
     :ok
   end
 
-  defp filter_error(error_info) do
-    IO.puts("--- #{__MODULE__}.filter_error(): #{inspect error_info}")
-    error_info
+  defp filter_error({:error, %module_name{}, _stack} = error_info) do
+    filters = Honeybadger.get_env(:filter_sasl_errors)
+    unless module_name in filters do
+      error_info
+    end
   end
+
+  defp filter_error(error_info), do: error_info
+
   defp merge_metadata(%{} = context, {_, metadata}) when is_list(metadata) do
     metadata
     |> Map.new()

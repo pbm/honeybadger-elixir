@@ -37,6 +37,17 @@ defmodule Honeybadger.LoggerTest do
     assert %{"request" => %{"context" => %{"user_id" => 1}}} = notification
   end
 
+  test "logging a crash gets filtered" do
+    with_config([filter_sasl_errors: [RuntimeError]], fn ->
+      :proc_lib.spawn(fn ->
+        Honeybadger.context(user_id: 1)
+        raise RuntimeError, "Oops"
+      end)
+
+      refute_receive {:api_request, _}
+    end)
+  end
+
   test "uses metadata as context" do
     :proc_lib.spawn(fn ->
       Logger.metadata(name: "Danny")
