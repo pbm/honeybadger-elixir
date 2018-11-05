@@ -79,8 +79,16 @@ defmodule Honeybadger.Logger do
 
   defp filter_error({:error, %module_name{}, _stack} = error_info) do
     filters = Honeybadger.get_env(:filter_sasl_errors)
-    unless module_name in filters do
+    # TODO
+    # unless module_name in filters do
+    if not module_name in filters do
+      IO.puts("--- PASS #{module_name}")
+      Logger.warn("--- DX #{__MODULE__}.filter_error: PASS module_name: #{inspect module_name}")
       error_info
+    else
+      IO.puts("--- FILTER #{module_name}")
+      Logger.warn("--- DX #{__MODULE__}.filter_error: FILTER module_name: #{inspect module_name}")
+      nil
     end
   end
 

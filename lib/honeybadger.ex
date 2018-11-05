@@ -24,7 +24,8 @@ defmodule Honeybadger do
         use_logger: true,
         notice_filter: Honeybadger.NoticeFilter.Default,
         filter: Honeybadger.Filter.Default,
-        filter_keys: [:password, :credit_card]
+        filter_keys: [:password, :credit_card],
+        filter_sasl_errors: []
 
   ### Notifying
 
@@ -89,6 +90,13 @@ defmodule Honeybadger do
   error reports for SASL compliant processes such as GenServers, GenEvents,
   Agents, Tasks and any process spawned using `proc_lib`. You can disable the
   logger by setting `use_logger` to false in your Honeybadger config.
+
+  You can filter the errors by setting the `:filter_sasl_errors`
+  configuration. The setting is a list of modules whose structs should be
+  filtered.  E.g. `filter_sasl_errors: [Some.Bothersome.Error,
+  RuntimeError]` will not report any crashes due to either
+  `%RuntimeError{...}` or `%Some.Bothersome.Error{...}`, but will report
+  all other exceptions to Honeybadger.
 
   ### Using a Notification Filter
 
