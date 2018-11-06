@@ -131,6 +131,8 @@ defmodule Honeybadger do
 
   use Application
 
+  require Logger
+
   alias Honeybadger.{Backtrace, Client, Notice}
 
   defmodule MissingEnvironmentNameError do
@@ -156,6 +158,8 @@ defmodule Honeybadger do
       |> put_dynamic_env()
       |> verify_environment_name!()
       |> persist_all_env()
+
+    Logger.warn(fn -> "--- #{__MODULE__}.start: config: #{inspect config}" end)
 
     if config[:use_logger] do
       :error_logger.add_report_handler(Honeybadger.Logger)

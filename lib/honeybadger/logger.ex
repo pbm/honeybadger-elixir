@@ -8,6 +8,7 @@ defmodule Honeybadger.Logger do
   alias Honeybadger.Utils
 
   def init(args) do
+    Logger.warn("--- #{__MODULE__}.init(): args: #{inspect args}")
     {:ok, args}
   end
 
@@ -18,12 +19,14 @@ defmodule Honeybadger.Logger do
   end
 
   def handle_event(event, state) do
+    Logger.warn("--- #{__MODULE__}.handle_event(): event #{inspect event}")
     handle_error(event)
 
     {:ok, state}
   end
 
   def handle_call({:configure, new_keys}, _state) do
+    Logger.warn("--- #{__MODULE__}.handle_call(): :configure  #{inspect new_keys}")
     {:ok, :ok, new_keys}
   end
 
@@ -46,12 +49,14 @@ defmodule Honeybadger.Logger do
   ## Helpers
 
   defp handle_error({:error_report, _gl, {_pid, _type, [message | _]}}) when is_list(message) do
+    Logger.warn("--- DX DX DX #{__MODULE__}.handle_error()")
     try do
       context =
         message
         |> get_in([:dictionary, :honeybadger_context])
         |> merge_metadata(get_in(message, [:dictionary, :logger_metadata]))
 
+      Logger.warn("--- DX DX DX #{__MODULE__}.handle_error()  message[:error_info]: #{inspect message[:error_info]}")
       message[:error_info]
       |> filter_error()
       |> case do
@@ -78,6 +83,7 @@ defmodule Honeybadger.Logger do
   end
 
   defp filter_error({:error, %module_name{}, _stack} = error_info) do
+    Logger.warn("--- #{__MODULE__}.filter_error()")
     filters = Honeybadger.get_env(:filter_sasl_errors)
     # TODO
     # unless module_name in filters do
